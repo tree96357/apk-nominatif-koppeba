@@ -7,32 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 <style>
 @media print {
-
-    body * {
-        visibility: hidden;
-    }
-
-    #printArea, #printArea * {
-        visibility: visible;
-    }
-
-    #printArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        display: block;
-    }
-
-    #printTable th, #printTable td {
-        border: 1px solid black;
-        padding: 4px;
-        text-align: center;
-    }
-
-    thead {
-        display: table-header-group;
-    }
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+    #printTable th, #printTable td { border: 1px solid black; padding: 4px; text-align: center; }
+    thead { display: table-header-group; }
 }
 </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
@@ -41,7 +20,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <style>
         :root {
             --accent-gold: #d4a853;
@@ -49,2433 +27,330 @@
             --accent-blue: #1e5f8a;
             --header-gray: #4a5568;
         }
-
         * { font-family: 'Poppins', sans-serif; box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; overflow-x: hidden; }
         .font-display { font-family: 'Playfair Display', serif; }
-
-        /* Military Background */
-        .military-bg {
-            background: linear-gradient(135deg, #0a0f1a 0%, #0c2d4d 30%, #1e5f8a 60%, #0c2d4d 80%, #0a0f1a 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .military-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(212,168,83,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212,168,83,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        .radar-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            pointer-events: none;
-        }
-
-        .radar-ring {
-            position: absolute;
-            border: 1px solid rgba(212,168,83,0.1);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: radarPulse 4s ease-out infinite;
-        }
-
-        .radar-ring:nth-child(1) { width: 200px; height: 200px; animation-delay: 0s; }
-        .radar-ring:nth-child(2) { width: 350px; height: 350px; animation-delay: 1s; }
-        .radar-ring:nth-child(3) { width: 500px; height: 500px; animation-delay: 2s; }
-        .radar-ring:nth-child(4) { width: 650px; height: 650px; animation-delay: 3s; }
-        .radar-ring:nth-child(5) { width: 800px; height: 800px; animation-delay: 4s; }
-
-        @keyframes radarPulse {
-            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.8); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
-        }
-
-        .radar-sweep {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 400px;
-            height: 400px;
-            transform-origin: center;
-            animation: radarSweep 6s linear infinite;
-            pointer-events: none;
-        }
-
-        .radar-sweep::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 200px;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(212,168,83,0.5) 0%, transparent 100%);
-            transform-origin: left center;
-        }
-
-        @keyframes radarSweep {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: particleFloat 15s linear infinite;
-        }
-
-        @keyframes particleFloat {
-            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
-        }
-
-        .scan-line {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%);
-            opacity: 0.1;
-            animation: scanLine 8s linear infinite;
-        }
-
-        @keyframes scanLine {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-
-        .corner-bracket {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-color: var(--accent-gold);
-            opacity: 0.3;
-        }
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
-}
-
-@keyframes pulse-glow {
-    0% { filter: drop-shadow(0 0 2px rgba(212, 168, 83, 0.4)); }
-    50% { filter: drop-shadow(0 0 10px rgba(212, 168, 83, 0.8)); }
-    100% { filter: drop-shadow(0 0 2px rgba(212, 168, 83, 0.4)); }
-}
-
-.animate-logo {
-    animation: float 3s ease-in-out infinite;
-}
-
-.logo-glow {
-    animation: pulse-glow 2s infinite;
-}
-        .corner-bracket.top-left { top: 20px; left: 20px; border-top: 2px solid; border-left: 2px solid; }
-        .corner-bracket.top-right { top: 20px; right: 20px; border-top: 2px solid; border-right: 2px solid; }
-        .corner-bracket.bottom-left { bottom: 20px; left: 20px; border-bottom: 2px solid; border-left: 2px solid; }
-        .corner-bracket.bottom-right { bottom: 20px; right: 20px; border-bottom: 2px solid; border-right: 2px solid; }
-
-        .login-card {
-            background: linear-gradient(145deg, rgba(12,45,77,0.95) 0%, rgba(10,30,50,0.98) 100%);
-            border: 1px solid rgba(212,168,83,0.3);
-            box-shadow: 0 0 60px rgba(212,168,83,0.1), 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,168,83,0.1);
-            animation: cardEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(50px) scale(0.9);
-            position: relative;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%);
-        }
-
-        @keyframes cardEntrance {
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .emblem {
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(212,168,83,0.2) 0%, rgba(12,45,77,1) 70%);
-            border: 2px solid var(--accent-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 40px rgba(212,168,83,0.3), inset 0 0 20px rgba(212,168,83,0.1);
-            position: relative;
-            animation: emblemGlow 3s ease-in-out infinite;
-        }
-
-        .emblem::after {
-            content: '';
-            position: absolute;
-            inset: -8px;
-            border: 1px solid rgba(212,168,83,0.3);
-            border-radius: 50%;
-            animation: emblemRing 3s ease-in-out infinite;
-        }
-
-        @keyframes emblemGlow {
-            0%, 100% { box-shadow: 0 0 40px rgba(212,168,83,0.3), inset 0 0 20px rgba(212,168,83,0.1); }
-            50% { box-shadow: 0 0 60px rgba(212,168,83,0.5), inset 0 0 30px rgba(212,168,83,0.2); }
-        }
-
-        @keyframes emblemRing {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.1); }
-        }
-
-        .input-field { 
-            transition: all 0.3s ease; 
-            border: 1px solid rgba(212,168,83,0.3); 
-            background: rgba(255,255,255,0.05);
-            color: white;
-        }
-
-        .input-field::placeholder { color: rgba(255,255,255,0.4); }
-
-        .input-field:focus { 
-            border-color: var(--accent-gold); 
-            background: rgba(255,255,255,0.1); 
-            box-shadow: 0 0 20px rgba(212,168,83,0.2); 
-            outline: none; 
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-gold) 0%, #b8943f 100%);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            color: #0c2d4d;
-            font-weight: 700;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-primary:hover::before { left: 100%; }
-        .btn-primary:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 30px rgba(212,168,83,0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(212,168,83,0.3);
-            transition: all 0.3s ease;
-            color: var(--accent-gold);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(212,168,83,0.2);
-            border-color: var(--accent-gold);
-        }
-
-        /* Dashboard */
+        .military-bg { background: linear-gradient(135deg, #0a0f1a 0%, #0c2d4d 30%, #1e5f8a 60%, #0c2d4d 80%, #0a0f1a 100%); position: relative; overflow: hidden; }
+        .login-card { background: linear-gradient(145deg, rgba(12,45,77,0.95) 0%, rgba(10,30,50,0.98) 100%); border: 1px solid rgba(212,168,83,0.3); box-shadow: 0 0 60px rgba(212,168,83,0.1); }
+        .input-field { transition: all 0.3s ease; border: 1px solid rgba(212,168,83,0.3); background: rgba(255,255,255,0.05); color: white; }
+        .input-field:focus { border-color: var(--accent-gold); background: rgba(255,255,255,0.1); outline: none; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-gold) 0%, #b8943f 100%); color: #0c2d4d; font-weight: 700; transition: all 0.3s ease; }
+        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(212,168,83,0.3); color: var(--accent-gold); }
         .dashboard-bg { background: linear-gradient(135deg, #0a0f1a 0%, #0c2d4d 50%, #0a0f1a 100%); min-height: 100vh; }
-        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(212,168,83,0.2); transition: all 0.3s ease; }
-        .glass-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(212,168,83,0.4); }
-
-        /* Table Styles */
-        .data-table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        
-        .data-table th { 
-            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%); 
-            color: var(--accent-gold); font-weight: 600; font-size: 11px; 
-            padding: 12px 8px; white-space: nowrap; position: sticky; top: 0; z-index: 20;
-            border-bottom: 2px solid var(--accent-gold);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .data-table th.sticky-col-no {
-            position: sticky; left: 0; z-index: 30;
-            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
-            box-shadow: 2px 0 8px rgba(0,0,0,0.5);
-        }
-        .data-table th.sticky-col-nama {
-            position: sticky; left: 50px; z-index: 30;
-            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
-            box-shadow: 2px 0 8px rgba(0,0,0,0.5);
-        }
-        .data-table th.sticky-col-aksi {
-            position: sticky; right: 0; z-index: 30;
-            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
-            box-shadow: -2px 0 8px rgba(0,0,0,0.5);
-        }
-        
-        .data-table td { 
-            padding: 10px 8px; border-bottom: 1px solid rgba(212,168,83,0.1); 
-            font-size: 11px; color: #e0e0e0; white-space: nowrap;
-            background: rgba(12,45,77,0.3);
-        }
-        
-        .data-table tbody tr { transition: all 0.2s ease; }
-        .data-table tbody tr:hover td { background: rgba(212,168,83,0.1); }
-        .data-table tbody tr:hover td.sticky-col-no,
-        .data-table tbody tr:hover td.sticky-col-nama,
-        .data-table tbody tr:hover td.sticky-col-aksi { background: rgba(212,168,83,0.15); }
-        .data-table tbody tr.dragging { opacity: 0.5; }
-        .data-table tbody tr.drag-over td { border-top: 3px solid var(--accent-gold); }
-        .data-table tbody tr.selected td { background: rgba(212,168,83,0.2); }
-
-        .data-table td.sticky-col-no {
-            position: sticky; left: 0; z-index: 10;
-            background: rgba(10,15,26,0.9);
-            box-shadow: 2px 0 8px rgba(0,0,0,0.4);
-            text-align: center;
-            width: 50px; min-width: 50px; max-width: 50px;
-            font-weight: 600;
-            color: var(--accent-gold);
-        }
-        .data-table td.sticky-col-nama {
-            position: sticky; left: 50px; z-index: 10;
-            background: rgba(10,15,26,0.9);
-            box-shadow: 2px 0 8px rgba(0,0,0,0.4);
-            min-width: 140px; max-width: 200px;
-            overflow: hidden; text-overflow: ellipsis;
-            font-weight: 500;
-        }
-        .data-table td.sticky-col-aksi {
-            position: sticky; right: 0; z-index: 10;
-            background: rgba(10,15,26,0.95);
-            box-shadow: -2px 0 8px rgba(0,0,0,0.4);
-            min-width: 200px;
-        }
-
-        .action-btn {
-            padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 600;
-            transition: all 0.2s ease;
-            cursor: pointer; border: 1px solid transparent;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .btn-sisip { background: transparent; color: #3b82f6; border-color: #3b82f6; }
-        .btn-sisip:hover { background: #3b82f6; color: white; }
-        .btn-biodata { background: transparent; color: #10b981; border-color: #10b981; }
-        .btn-biodata:hover { background: #10b981; color: white; }
-        .btn-edit { background: transparent; color: var(--accent-gold); border-color: var(--accent-gold); }
-        .btn-edit:hover { background: var(--accent-gold); color: #0c2d4d; }
-        .btn-hapus { background: transparent; color: #ef4444; border-color: #ef4444; }
-        .btn-hapus:hover { background: #ef4444; color: white; }
-
-        .drag-handle { cursor: grab; color: #4a5568; padding: 2px; display: inline-block; }
-        .drag-handle:hover { color: var(--accent-gold); }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(212,168,83,0.2); }
+        .data-table th { background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%); color: var(--accent-gold); font-size: 11px; padding: 12px 8px; position: sticky; top: 0; z-index: 20; border-bottom: 2px solid var(--accent-gold); }
+        .data-table td { padding: 10px 8px; border-bottom: 1px solid rgba(212,168,83,0.1); font-size: 11px; color: #e0e0e0; background: rgba(12,45,77,0.3); }
+        .action-btn { padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+        .btn-sisip { color: #3b82f6; border-color: #3b82f6; }
+        .btn-biodata { color: #10b981; border-color: #10b981; }
+        .btn-edit { color: var(--accent-gold); border-color: var(--accent-gold); }
+        .btn-hapus { color: #ef4444; border-color: #ef4444; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: linear-gradient(145deg, #0c2d4d 0%, #0a0f1a 100%); border: 1px solid rgba(212,168,83,0.3); border-radius: 8px; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; animation: modalIn 0.3s ease; }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        /* Biodata Print */
-        .biodata-print { background: white; color: #1a1a2e; padding: 20px; position: relative; }
-        .biodata-photo-box { width: 4cm !important; height: 6cm !important; border: 1px solid #000; position: absolute; top: 20px; right: 20px; background: #f0f0f0; }
-        .biodata-photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        .biodata-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .biodata-table td { padding: 4px 6px; border: 1px solid #000; font-size: 11px; }
-        .biodata-table .label { width: 35%; background: #f0f4f8; font-weight: 500; }
-        .biodata-header { text-align: center; font-weight: bold; font-size: 14px; background: #0c2d4d; color: #d4a853; padding: 8px; margin-bottom: 15px; }
-
-        /* Photo Upload */
-        .photo-container { width: 150px; height: 200px; border: 2px dashed rgba(212,168,83,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: rgba(255,255,255,0.02); transition: all 0.3s; }
-        .photo-container:hover { border-color: var(--accent-gold); background: rgba(212,168,83,0.05); }
-        .photo-container img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Toast */
-        .toast { position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; z-index: 9999; transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-left: 4px solid; }
+        .modal-content { background: linear-gradient(145deg, #0c2d4d 0%, #0a0f1a 100%); border: 1px solid rgba(212,168,83,0.3); border-radius: 8px; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .photo-container { width: 150px; height: 200px; border: 2px dashed rgba(212,168,83,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: rgba(255,255,255,0.02); }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; color: white; z-index: 9999; transform: translateX(150%); transition: transform 0.4s; }
         .toast.show { transform: translateX(0); }
-        .toast-success { background: linear-gradient(135deg, #065f46 0%, #047857 100%); border-color: #10b981; }
-        .toast-error { background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%); border-color: #f87171; }
-        .toast-info { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-color: #60a5fa; }
-
-        /* Status badges */
-        .status-badge { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status-divinitive { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
-        .status-ptt { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid #f59e0b; }
-        .status-tugas { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid #3b82f6; }
-        .status-pensiun { background: rgba(107,114,128,0.2); color: #9ca3af; border: 1px solid #9ca3af; }
-
-        /* Stagger Animation */
-        .stagger-item { opacity: 0; transform: translateY(20px); animation: staggerIn 0.5s ease forwards; }
-        @keyframes staggerIn { to { opacity: 1; transform: translateY(0); } }
-
-        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23d4a853' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-        }
-        *:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 4px; }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        .shake { animation: shake 0.3s ease; }
-
-        /* Checkbox custom */
-        .custom-checkbox {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(212,168,83,0.5);
-            border-radius: 3px;
-            appearance: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .custom-checkbox:checked {
-            background: var(--accent-gold);
-            border-color: var(--accent-gold);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230c2d4d' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
-            background-size: 12px;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10,15,26,0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9998;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .toast-success { background: #047857; }
+        .toast-error { background: #b91c1c; }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(10,15,26,0.9); display: none; align-items: center; justify-content: center; z-index: 9998; flex-direction: column; gap: 20px; }
         .loading-overlay.active { display: flex; }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(212,168,83,0.2);
-            border-top-color: var(--accent-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Chart container */
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(212,168,83,0.2); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <!-- Toast -->
     <div id="toast" class="toast" role="alert"></div>
-
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="spinner"></div>
         <p class="text-[#d4a853] font-medium">Memproses...</p>
     </div>
 
-    <!-- Login Page -->
-    <div id="loginPage" class="military-bg min-h-screen flex items-center justify-center p-4 relative">
-        <div class="radar-container">
-            <div class="radar-ring"></div>
-            <div class="radar-ring"></div>
-            <div class="radar-ring"></div>
-            <div class="radar-ring"></div>
-            <div class="radar-ring"></div>
-        </div>
-        <div class="radar-sweep"></div>
-        <div class="scan-line"></div>
-        <div class="corner-bracket top-left"></div>
-        <div class="corner-bracket top-right"></div>
-        <div class="corner-bracket bottom-left"></div>
-        <div class="corner-bracket bottom-right"></div>
-        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
-        <div class="particle" style="left: 50%; animation-delay: 1s;"></div>
-        <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
-        <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
-        <div class="particle" style="left: 95%; animation-delay: 2.5s;"></div>
+    <!-- Halaman Login -->
+    <div id="loginPage" class="military-bg min-h-screen flex items-center justify-center p-4">
         <div class="login-card rounded-lg p-8 md:p-10 w-full max-w-md relative z-10">
-    <!-- LOGO BULAT -->
-
-<div class="flex justify-center mb-6">
-    <img src="logo.png"
-         alt="Logo KOPPEBA"
-         style="
-            width:150px;
-            height:auto;
-            filter: drop-shadow(0 0 12px rgba(212,168,83,0.7));
-         ">
-</div>
-
-    <!-- JUDUL -->
-    <div class="text-center mb-8">
-        <h1 class="font-display text-2xl md:text-3xl font-bold text-white mb-2">KOPPEBA</h1>
-        <p class="text-[#d4a853] font-medium text-sm md:text-base tracking-widest">KOARMADA RI</p>
-        <div class="w-20 h-0.5 bg-gradient-to-r from-transparent via-[#d4a853] to-transparent mx-auto mt-4"></div>
-    </div>
-
-    <!-- FORM LOGIN -->
-    <form id="loginForm" class="space-y-5">
-        
+            <div class="flex justify-center mb-6">
+                <img src="logo.png" alt="Logo KOPPEBA" style="width:150px; height:auto; filter: drop-shadow(0 0 12px rgba(212,168,83,0.7));">
+            </div>
+            <div class="text-center mb-8">
+                <h1 class="font-display text-2xl md:text-3xl font-bold text-white mb-2">KOPPEBA</h1>
+                <p class="text-[#d4a853] font-medium text-sm tracking-widest">KOARMADA RI</p>
+            </div>
+            <form id="loginForm" class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Nama Pengguna</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#d4a853]">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </span>
-                        <input type="text" id="username" class="input-field w-full pl-12 pr-4 py-3 rounded-lg" placeholder="Masukkan nama pengguna" required>
-                    </div>
+                    <input type="text" id="username" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="Masukkan nama pengguna" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Kata Sandi</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#d4a853]">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </span>
-                        <input type="password" id="password" class="input-field w-full pl-12 pr-12 py-3 rounded-lg" placeholder="Masukkan kata sandi" required>
-                        <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#d4a853]" aria-label="Toggle password">
-                            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded border-gray-600 text-[#d4a853] bg-transparent">
-                    <label for="rememberMe" class="ml-2 text-sm text-gray-400">Ingat saya</label>
+                    <input type="password" id="password" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="Masukkan kata sandi" required>
                 </div>
                 <button type="submit" class="btn-primary w-full py-3.5 rounded-lg text-sm tracking-wider">MASUK</button>
             </form>
-            <p class="text-center text-xs text-gray-600 mt-6">SISTEM INFORMASI PERSONEL</p>
         </div>
     </div>
 
     <!-- Dashboard -->
     <div id="dashboardPage" class="dashboard-bg hidden min-h-screen">
-        <header class="bg-[#0a0f1a]/95 backdrop-blur-sm border-b border-[#d4a853]/30 sticky top-0 z-50">
-            <div class="max-w-full mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded bg-gradient-to-br from-[#d4a853] to-[#8b6914] flex items-center justify-center">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0c2d4d" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    </div>
-                    <div>
-                        <h1 class="font-display text-lg font-bold text-white">KOPPEBA KOARMADA RI</h1>
-                        <p class="text-xs text-[#d4a853] tracking-wider">SISTEM INFORMASI PERSONEL</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span id="welcomeUser" class="text-gray-300 text-sm hidden md:block"></span>
-                    <button id="logoutBtn" class="px-4 py-2 rounded border border-red-500/50 text-red-400 hover:bg-red-500/20 text-sm font-medium transition-colors">KELUAR</button>
-                </div>
-            </div>
+        <header class="bg-[#0a0f1a]/95 border-b border-[#d4a853]/30 sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
+            <h1 class="font-display text-lg font-bold text-white">KOPPEBA KOARMADA RI</h1>
+            <button id="logoutBtn" class="px-4 py-2 rounded border border-red-500/50 text-red-400 text-sm">KELUAR</button>
         </header>
-
         <main class="px-4 py-4">
-            <!-- Toolbar -->
-            <div class="glass-card rounded-lg p-3 mb-4 stagger-item" style="animation-delay: 0.1s">
-                <div class="flex flex-wrap items-center gap-2">
-                    <button id="addDataBtn" class="btn-primary px-4 py-2 rounded text-sm flex items-center gap-2">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                        Tambah
-                    </button>
-                    <button id="statistikBtn" class="btn-secondary px-4 py-2 rounded text-sm">Statistik</button>
-                    <button id="historyBtn" class="btn-secondary px-4 py-2 rounded text-sm">Riwayat</button>
-                    <div class="h-6 w-px bg-gray-700 mx-1"></div>
-                    <button id="importBtn" class="btn-secondary px-4 py-2 rounded text-sm">Import Excel</button>
-                    <button id="backupBtn" class="btn-secondary px-4 py-2 rounded text-sm">Backup</button>
-                    <button id="restoreBtn" class="btn-secondary px-4 py-2 rounded text-sm">Restore</button>
-                    <div class="h-6 w-px bg-gray-700 mx-1"></div>
-                    <button id="printReportBtn" class="btn-secondary px-4 py-2 rounded text-sm">Cetak</button>
-                    <button id="exportPdfBtn" class="btn-secondary px-4 py-2 rounded text-sm">PDF</button>
-                    <button id="exportWordBtn" class="btn-secondary px-4 py-2 rounded text-sm">Word</button>
-                    <button id="exportExcelBtn" class="btn-secondary px-4 py-2 rounded text-sm">Excel</button>
-                    <button id="exportExcelRingkasBtn" class="btn-secondary px-4 py-2 rounded text-sm">Excel Ringkas</button>
-                    <div class="h-6 w-px bg-gray-700 mx-1"></div>
-                    <input type="text" id="searchInput" class="px-3 py-2 rounded bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm min-w-[180px]" placeholder="Cari...">
-                    <select id="filterPangkat" class="px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                        <option value="">Semua Pangkat</option>
-                        <option value="Jenderal">Jenderal</option>
-                        <option value="Laksamana">Laksamana</option>
-                        <option value="Marsekal">Marsekal</option>
-                        <option value="Kapten">Kapten</option>
-                        <option value="Letnan">Letnan</option>
-                        <option value="Sersan">Sersan</option>
-                        <option value="Kopral">Kopral</option>
-                        <option value="Prajurit">Prajurit</option>
-                    </select>
-                    <select id="filterStatus" class="px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                        <option value="">Semua Status</option>
-                        <option value="Divinitiv">Divinitiv</option>
-                        <option value="Ptt">Ptt</option>
-                        <option value="Tugas Belajar">Tugas Belajar</option>
-                        <option value="Pensiun">Pensiun</option>
-                    </select>
-                    <button id="deleteSelectedBtn" class="px-4 py-2 rounded border border-red-500/50 text-red-400 hover:bg-red-500/20 text-sm hidden">Hapus Terpilih</button>
-                </div>
+            <div class="glass-card rounded-lg p-3 mb-4 flex flex-wrap gap-2">
+                <button id="addDataBtn" class="btn-primary px-4 py-2 rounded text-sm">Tambah</button>
+                <button id="statistikBtn" class="btn-secondary px-4 py-2 rounded text-sm">Statistik</button>
+                <button id="historyBtn" class="btn-secondary px-4 py-2 rounded text-sm">Riwayat</button>
+                <button id="importBtn" class="btn-secondary px-4 py-2 rounded text-sm">Import Excel</button>
+                <button id="backupBtn" class="btn-secondary px-4 py-2 rounded text-sm">Backup</button>
+                <button id="restoreBtn" class="btn-secondary px-4 py-2 rounded text-sm">Restore</button>
+                <button id="printReportBtn" class="btn-secondary px-4 py-2 rounded text-sm">Cetak</button>
+                <button id="exportPdfBtn" class="btn-secondary px-4 py-2 rounded text-sm">PDF</button>
+                <button id="exportWordBtn" class="btn-secondary px-4 py-2 rounded text-sm">Word</button>
+                <button id="exportExcelBtn" class="btn-secondary px-4 py-2 rounded text-sm">Excel</button>
+                <input type="text" id="searchInput" class="px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="Cari...">
             </div>
-
-            <!-- Table -->
-            <div class="glass-card rounded-lg overflow-hidden stagger-item" style="animation-delay: 0.2s">
-                <div class="overflow-x-auto" style="max-height: calc(100vh - 200px);">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width:40px; left:0; position:sticky; z-index:31;"><input type="checkbox" id="selectAll" class="custom-checkbox"></th>
-                                <th class="sticky-col-no" style="width:50px; left:40px;">No</th>
-                                <th class="sticky-col-nama" style="width:120px; left:90px;">Nama</th>
-                                <th style="min-width:40px"></th>
-                                <th style="min-width:60px">Foto</th>
-                                <th style="min-width:140px">Pangkat/Korps/NRP</th>
-                                <th style="min-width:90px">TMT Pangkat</th>
-                                <th style="min-width:70px">MDDP</th>
-                                <th style="min-width:130px">TTL</th>
-                                <th style="min-width:60px">Usia</th>
-                                <th style="min-width:90px">TMT TNI AL</th>
-                                <th style="min-width:70px">Masa Dinas</th>
-                                <th style="min-width:90px">TMT Kotama</th>
-                                <th style="min-width:120px">Jabatan</th>
-                                <th style="min-width:90px">TMT Jabatan</th>
-                                <th style="min-width:70px">MDDJ</th>
-                                <th style="min-width:100px">Dikum</th>
-                                <th style="min-width:100px">Dikmil</th>
-                                <th style="min-width:100px">Dikbang</th>
-                                <th style="min-width:80px">Buku Saku</th>
-                                <th style="min-width:100px">No Asabri</th>
-                                <th style="min-width:80px">Agama</th>
-                                <th style="min-width:70px">Status</th>
-                                <th style="min-width:60px">Tunj</th>
-                                <th style="min-width:60px">Tinggal</th>
-                                <th style="min-width:150px">Alamat/Telp</th>
-                                <th style="min-width:70px">Status</th>
-                                <th class="sticky-col-aksi" style="width:200px">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dataTableBody"></tbody>
-                    </table>
-                </div>
+            <div class="glass-card rounded-lg overflow-hidden">
+                <table class="data-table w-full">
+                    <thead>
+                        <tr>
+                            <th>No</th><th>Nama</th><th>Pangkat/Korps/NRP</th><th>Jabatan</th><th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody"></tbody>
+                </table>
                 <p id="emptyMessage" class="text-center text-gray-500 py-8 hidden">Tidak ada data personel</p>
             </div>
         </main>
     </div>
 
-    <!-- Hidden file inputs -->
-    <input type="file" id="importInput" accept=".xlsx,.xls" class="hidden">
-    <input type="file" id="restoreInput" accept=".json" class="hidden">
-
     <!-- Modal Form -->
     <div id="formModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="p-4 border-b border-[#d4a853]/30 flex items-center justify-between">
-                <h2 id="formTitle" class="text-xl font-bold text-[#d4a853]">Tambah Data Personel</h2>
-                <button id="closeFormModal" class="text-gray-500 hover:text-white text-2xl">&times;</button>
-            </div>
-            <form id="dataForm" class="p-4 max-h-[70vh] overflow-y-auto">
+        <div class="modal-content p-6">
+            <h2 id="formTitle" class="text-xl font-bold text-[#d4a853] mb-4">Tambah Data Personel</h2>
+            <form id="dataForm" class="space-y-4">
                 <input type="hidden" id="editId">
-                <input type="hidden" id="insertAfterId">
-                
-                <div class="mb-6 flex flex-col items-center">
+                <div class="flex flex-col items-center">
                     <div id="photoContainer" class="photo-container mb-2">
-                        <div id="photoPlaceholder" class="text-center text-gray-500">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto mb-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            <span class="text-xs">Upload Foto</span>
-                        </div>
+                        <span id="photoPlaceholder" class="text-xs text-gray-400">Upload Foto</span>
                         <img id="photoPreview" class="hidden w-full h-full object-cover">
                     </div>
                     <input type="file" id="photoInput" accept="image/*" class="hidden">
-                    <button type="button" id="uploadPhotoBtn" class="text-[#d4a853] text-sm hover:underline">Pilih Foto</button>
-                    <button type="button" id="removePhotoBtn" class="text-red-400 text-sm hover:underline hidden">Hapus Foto</button>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="lg:col-span-2">
-                        <label class="block text-sm text-gray-400 mb-1">1. Nama</label>
-                        <input type="text" id="nama" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">2. Pangkat/Korps/NRP</label>
-                        <input type="text" id="pangkatKorpsNrp" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="Mayor Laut (T) 12345/P" required>
-                        <p id="nrpError" class="text-xs text-red-400 mt-1 hidden">NRP sudah terdaftar!</p>
-                        <p class="text-xs text-gray-500 mt-1">Contoh: Mayor Laut (T) 12345/P</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">3. TMT Pangkat (DD/MM/YYYY)</label>
-                        <input type="text" id="tmtPangkat" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="01/01/2020">
-                        <p class="text-xs text-[#d4a853] mt-1">MDDP: <span id="mddp">-</span></p>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">4. Tempat, Tanggal Lahir</label>
-                        <input type="text" id="tempatTglLahir" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="Jakarta, 01/01/1990" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">5. Usia (Otomatis)</label>
-                        <input type="text" id="usia" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">6. TMT TNI AL</label>
-                        <input type="text" id="tmtTniAl" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="01/01/2010">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">7. Masa Dinas (Otomatis)</label>
-                        <input type="text" id="masaDinas" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">8. TMT Kotama</label>
-                        <input type="text" id="tmtKotama" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="01/01/2020">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">9. Jabatan</label>
-                        <input type="text" id="jabatan" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">TMT Jabatan</label>
-                        <input type="text" id="tmtJabatan" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" placeholder="01/01/2022">
-                        <p class="text-xs text-[#d4a853] mt-1">MDDJ: <span id="mddj">-</span></p>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">10. Dikum</label>
-                        <input type="text" id="dikum" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">11. Dikmil</label>
-                        <input type="text" id="dikmil" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">12. Dikbang</label>
-                        <input type="text" id="dikbang" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">13. Buku Saku</label>
-                        <input type="text" id="bukuSaku" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">14. Nomor Asabri</label>
-                        <input type="text" id="nomorAsabri" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">15. Agama</label>
-                        <select id="agama" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                            <option value="">Pilih</option>
-                            <option value="Islam">Islam</option>
-                            <option value="Kristen">Kristen</option>
-                            <option value="Katolik">Katolik</option>
-                            <option value="Hindu">Hindu</option>
-                            <option value="Buddha">Buddha</option>
-                            <option value="Konghucu">Konghucu</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">16. Status Perkawinan</label>
-                        <select id="statusPerkawinan" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                            <option value="">Pilih</option>
-                            <option value="TK">TK</option>
-                            <option value="K/0">K/0</option>
-                            <option value="K/1">K/1</option>
-                            <option value="K/2">K/2</option>
-                            <option value="K/3">K/3</option>
-                            <option value="K/4">K/4</option>
-                            <option value="K/5">K/5</option>
-                            <option value="Janda">Janda</option>
-                            <option value="Duda">Duda</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">17. Tunjangan</label>
-                        <select id="tunjangan" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                            <option value="">Pilih</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">18. Status Tempat Tinggal</label>
-                        <select id="statusTempatTinggal" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                            <option value="">Pilih</option>
-                            <option value="S">S (Sendiri)</option>
-                            <option value="D">D (Dinas)</option>
-                            <option value="M">M (Menumpang)</option>
-                            <option value="K">K (Kontrak)</option>
-                            <option value="N">N (Negara)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">19. Alamat / Telepon</label>
-                        <input type="text" id="alamatTelp" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">Status Personel</label>
-                        <select id="statusPersonel" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm">
-                            <option value="Divinitiv">Divinitiv</option>
-                            <option value="Ptt">Ptt</option>
-                            <option value="Tugas Belajar">Tugas Belajar</option>
-                            <option value="Pensiun">Pensiun</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Nama</label>
+                    <input type="text" id="nama" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" required>
                 </div>
-
-                <div class="flex gap-3 mt-6 pt-4 border-t border-white/10">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Pangkat/Korps/NRP</label>
+                    <input type="text" id="pangkatKorpsNrp" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Jabatan</label>
+                    <input type="text" id="jabatan" class="w-full px-3 py-2 rounded bg-white/5 border border-white/10 text-white text-sm" required>
+                </div>
+                <div class="flex gap-3 pt-4">
                     <button type="submit" class="btn-primary px-6 py-2 rounded text-sm">SIMPAN</button>
-                    <button type="button" id="resetFormBtn" class="px-6 py-2 rounded bg-white/5 text-gray-400 hover:bg-white/10 text-sm">Reset</button>
+                    <button type="button" id="closeFormModal" class="px-6 py-2 rounded bg-white/5 text-gray-400 text-sm">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal Biodata -->
-    <div id="biodataModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="p-4 border-b border-[#d4a853]/30 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-[#d4a853]">Biodata Personel</h2>
-                <div class="flex gap-2">
-                    <button id="printBiodataBtn" class="btn-secondary px-4 py-2 rounded text-sm">Cetak</button>
-                    <button id="closeBiodataModal" class="text-gray-500 hover:text-white text-2xl">&times;</button>
-                </div>
-            </div>
-            <div id="biodataContent" class="biodata-print"></div>
-        </div>
-    </div>
-
-    <!-- Modal Statistik -->
-    <div id="statistikModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="p-4 border-b border-[#d4a853]/30 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-[#d4a853]">Statistik Personel</h2>
-                <button id="closeStatistikModal" class="text-gray-500 hover:text-white text-2xl">&times;</button>
-            </div>
-            <div id="statistikContent" class="p-6"></div>
-        </div>
-    </div>
-
-    <!-- Modal History -->
-    <div id="historyModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="p-4 border-b border-[#d4a853]/30 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-[#d4a853]">Riwayat Aktivitas</h2>
-                <button id="closeHistoryModal" class="text-gray-500 hover:text-white text-2xl">&times;</button>
-            </div>
-            <div id="historyContent" class="p-6 max-h-[70vh] overflow-y-auto"></div>
-        </div>
-    </div>
+    <input type="file" id="importInput" accept=".xlsx,.xls" class="hidden">
+    <input type="file" id="restoreInput" accept=".json" class="hidden">
 
     <script>
-        // ==================== CONFIGURATION ====================
         const VALID_PASSWORD = "123";
-
-        // ==================== IndexedDB ====================
         const DB_NAME = 'KOPPEBA_DB_V10';
-        const DB_VERSION = 2;
-        const STORE_NAME = 'personel';
-        const USER_STORE = 'users';
-        const HISTORY_STORE = 'history';
-        let db = null;
+        let db = null, allData = [], currentPhoto = '';
 
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                const request = indexedDB.open(DB_NAME, 2);
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => { db = request.result; resolve(db); };
-                request.onupgradeneeded = (event) => {
-                    const database = event.target.result;
-                    if (!database.objectStoreNames.contains(STORE_NAME)) {
-                        const store = database.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                        store.createIndex('orderIndex', 'orderIndex', { unique: false });
-                    }
-                    if (!database.objectStoreNames.contains(USER_STORE)) {
-                        database.createObjectStore(USER_STORE, { keyPath: 'username' });
-                    }
-                    if (!database.objectStoreNames.contains(HISTORY_STORE)) {
-                        database.createObjectStore(HISTORY_STORE, { keyPath: 'id', autoIncrement: true });
-                    }
+                request.onupgradeneeded = (e) => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains('personel')) database.createObjectStore('personel', { keyPath: 'id', autoIncrement: true });
                 };
             });
         }
 
-        const dbOperation = (storeName, mode, operation) => {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], mode);
-                const store = transaction.objectStore(storeName);
-                const request = operation(store);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
+        const showToast = (msg, type = 'success') => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast toast-${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
         };
 
-        const addPersonel = (data, insertAfterId = null) => addOrUpdatePersonel(data, insertAfterId, false);
-        
-        async function addOrUpdatePersonel(data, insertAfterId = null, isUpdate = false) {
-            return new Promise(async (resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                const getAllRequest = store.getAll();
-                
-                getAllRequest.onsuccess = () => {
-                    const rawItems = getAllRequest.result;
-                    let items = rawItems.map(item => ({
-                        ...item,
-                        orderIndex: typeof item.orderIndex === 'number' ? item.orderIndex : (item.id || 0)
-                    }));
-                    items.sort((a, b) => a.orderIndex - b.orderIndex);
-                    let newOrder = 0;
-
-                    if (!isUpdate) {
-                        if (insertAfterId !== null) {
-                            const visualIndex = items.findIndex(item => item.id === insertAfterId);
-                            if (visualIndex !== -1) {
-                                const targetOrder = items[visualIndex].orderIndex;
-                                const nextItem = items[visualIndex + 1];
-                                newOrder = nextItem ? (targetOrder + nextItem.orderIndex) / 2 : targetOrder + 1000;
-                            } else {
-                                newOrder = items.length > 0 ? items[items.length - 1].orderIndex + 1000 : 0;
-                            }
-                        } else {
-                            newOrder = items.length > 0 ? items[items.length - 1].orderIndex + 1000 : 0;
-                        }
-                        data.orderIndex = newOrder;
-                        data.createdAt = new Date().toISOString();
-                    }
-
-                    const request = isUpdate ? store.put(data) : store.add(data);
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                };
-            });
-        }
-
-        const updatePersonel = (data) => addOrUpdatePersonel(data, null, true);
-        const deletePersonel = (id) => dbOperation(STORE_NAME, 'readwrite', store => store.delete(id));
-        const getAllPersonel = () => new Promise((resolve, reject) => {
-            const transaction = db.transaction([STORE_NAME], 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.getAll();
-            request.onsuccess = () => {
-                const result = request.result.map(item => ({
-                    ...item,
-                    orderIndex: typeof item.orderIndex === 'number' ? item.orderIndex : (item.id || 0)
-                })).sort((a, b) => a.orderIndex - b.orderIndex);
-                resolve(result);
-            };
-            request.onerror = () => reject(request.error);
-        });
-
-        const saveUser = (username, remember) => dbOperation(USER_STORE, 'readwrite', store => store.put({ username, remember, lastLogin: new Date().toISOString() }));
-        const getRememberedUser = () => new Promise((resolve, reject) => {
-            const transaction = db.transaction([USER_STORE], 'readonly');
-            const store = transaction.objectStore(USER_STORE);
-            const request = store.getAll();
-            request.onsuccess = () => resolve(request.result.find(u => u.remember) || null);
-            request.onerror = () => reject(request.error);
-        });
-
-        const addHistory = (action, detail) => dbOperation(HISTORY_STORE, 'readwrite', store => store.add({ action, detail, timestamp: new Date().toISOString() }));
-        const getAllHistory = () => dbOperation(HISTORY_STORE, 'readonly', store => store.getAll());
-        const clearHistory = () => dbOperation(HISTORY_STORE, 'readwrite', store => store.clear());
-
-        // ==================== DOM & STATE ====================
-        const $ = id => document.getElementById(id);
-        const loginPage = $('loginPage');
-        const dashboardPage = $('dashboardPage');
-        const loadingOverlay = $('loadingOverlay');
-        const toast = $('toast');
-        let allData = [];
-        let currentPhoto = '';
-        let draggedRow = null;
-        let currentUser = 'User';
-        let selectedIds = new Set();
-
-        // ==================== Utilities ====================
-        const showLoading = () => loadingOverlay.classList.add('active');
-        const hideLoading = () => loadingOverlay.classList.remove('active');
-        
-        const showToast = (message, type = 'success') => {
-            toast.textContent = message;
-            toast.className = `toast toast-${type} show`;
-            setTimeout(() => toast.classList.remove('show'), 4000);
-        };
-
-        const escapeHtml = (text) => {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        };
-
-        function parseDate(str) {
-            if (!str) return null;
-            const parts = str.split('/');
-            if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-            return null;
-        }
-
-        function calculateMDD(dateStr) {
-            const date = parseDate(dateStr);
-            if (!date) return '-';
-            const now = new Date();
-            const diff = now - date;
-            const years = Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
-            const months = Math.floor((diff % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
-            return `${years}Th ${months}Bl`;
-        }
-
-        function calculateAge(ttlStr) {
-            if (!ttlStr) return '-';
-            const parts = ttlStr.split(',');
-            if (parts.length > 1) {
-                const date = parseDate(parts[1].trim());
-                if (date) {
-                    const now = new Date();
-                    const age = Math.floor((now - date) / (365.25 * 24 * 60 * 60 * 1000));
-                    return `${age} Thn`;
-                }
-            }
-            return '-';
-        }
-
-        // ==================== FUNGSI EKSTRAKSI YANG DIPERBAIKI ====================
-        
-        // Fungsi untuk mengekstrak pangkat dari string
-        function extractPangkat(pangkatKorpsNrp) {
-            if (!pangkatKorpsNrp) return '-';
-            // Hapus NRP (angka + /huruf) dari string, sisakan pangkat
-            let result = pangkatKorpsNrp.replace(/\d{4,6}\s*\/?\s*[A-Z]?/gi, '').trim();
-            // Bersihkan spasi ganda dan kurung berlebih
-            result = result.replace(/\s+/g, ' ').trim();
-            return result || '-';
-        }
-
-        // Fungsi untuk mengekstrak NRP dari string - DIPERBAIKI
-        function extractNRP(pangkatKorpsNrp) {
-            if (!pangkatKorpsNrp) return '-';
-            
-            // Cari pola NRP: 4-6 digit angka diikuti opsional /huruf
-            // Contoh: 12345/P, 123456/T, 12345 P, 12345/P
-            const match = pangkatKorpsNrp.match(/(\d{4,6})\s*(\/?)\s*([A-Z])?/i);
-            
-            if (match) {
-                const angka = match[1];
-                const garisMiring = match[2] || '';
-                const kode = match[3] || '';
-                
-                // Normalisasi: selalu kembalikan format XXXXXX/X
-                if (kode) {
-                    return `${angka}/${kode.toUpperCase()}`;
-                }
-                return angka;
-            }
-            
-            // Fallback: cari angka berurutan saja
-            const fallbackMatch = pangkatKorpsNrp.match(/(\d{4,6})/);
-            if (fallbackMatch) {
-                return fallbackMatch[1];
-            }
-            
-            return '-';
-        }
-
-        // Fungsi validasi NRP yang diperbaiki
-        function validateNRP(pangkatKorpsNrp, excludeId = null) {
-            const newNrp = extractNRP(pangkatKorpsNrp);
-            
-            // Jika tidak bisa mengekstrak NRP, anggap valid (bisa jadi format berbeda)
-            if (newNrp === '-') return true;
-            
-            // Cek apakah NRP sudah ada di database
-            const exists = allData.some(item => {
-                const existingNrp = extractNRP(item.pangkatKorpsNrp);
-                return existingNrp === newNrp && item.id !== excludeId;
-            });
-            
-            return !exists;
-        }
-
-        // ==================== END FUNGSI EKSTRAKSI ====================
-
-        function speakWelcome() {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance('SELAMAT DATANG DI KOPPEBA KOARMADA RI jalan gunung sahari nomor 67 jakarta pusat dekat pasar baru');
-                const voices = window.speechSynthesis.getVoices();
-                const indonesianVoice = voices.find(v => v.lang.includes('id')) || voices.find(v => v.name.toLowerCase().includes('google'));
-                if (indonesianVoice) utterance.voice = indonesianVoice;
-                utterance.lang = 'id-ID';
-                utterance.rate = 0.9;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        // ==================== Login ====================
-        $('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = $('username').value.trim();
-            const password = $('password').value;
-            
-            if (password !== VALID_PASSWORD) {
+            if (document.getElementById('password').value !== VALID_PASSWORD) {
                 showToast('Kata sandi salah!', 'error');
-                $('password').classList.add('shake');
-                setTimeout(() => $('password').classList.remove('shake'), 300);
-                $('password').value = '';
                 return;
             }
-            
-            if ($('rememberMe').checked) await saveUser(username, true);
-            currentUser = username;
-            loginPage.classList.add('hidden');
-            dashboardPage.classList.remove('hidden');
-            $('welcomeUser').textContent = `Halo, ${username}`;
-            setTimeout(speakWelcome, 500);
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
             await loadData();
             showToast('Login berhasil');
         });
 
-        $('togglePassword').addEventListener('click', () => {
-            const isPassword = $('password').type === 'password';
-            $('password').type = isPassword ? 'text' : 'password';
-            $('eyeIcon').innerHTML = isPassword 
-                ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-                : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-        });
-
-        $('logoutBtn').addEventListener('click', () => {
-            if (db) { const transaction = db.transaction([USER_STORE], 'readwrite'); transaction.objectStore(USER_STORE).clear(); }
-            loginPage.classList.remove('hidden');
-            dashboardPage.classList.add('hidden');
-            $('loginForm').reset();
-            showToast('Berhasil keluar');
-        });
-
-        // ==================== Data Management ====================
         async function loadData() {
-            try {
-                allData = await getAllPersonel();
+            const tx = db.transaction(['personel'], 'readonly');
+            const store = tx.objectStore('personel');
+            const req = store.getAll();
+            req.onsuccess = () => {
+                allData = req.result;
                 renderTable(allData);
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showToast('Gagal memuat data', 'error');
-            }
+            };
         }
 
         function renderTable(data) {
-            const tbody = $('dataTableBody');
-            if (data.length === 0) {
-                tbody.innerHTML = '';
-                $('emptyMessage').classList.remove('hidden');
-                $('deleteSelectedBtn').classList.add('hidden');
-                return;
-            }
-            $('emptyMessage').classList.add('hidden');
-            $('deleteSelectedBtn').classList.toggle('hidden', selectedIds.size === 0);
-            
-            tbody.innerHTML = data.map((item, index) => {
-                const statusClass = item.statusPersonel === 'Divinitiv' ? 'status-devinitiv':
-                                   item.statusPersonel === 'Ptt' ? 'status-ptt':
-                                   item.statusPersonel === 'Tugas Belajar' ? 'status-tugas' : 'status-pensiun';
-                const isSelected = selectedIds.has(item.id);
-                return `
-                <tr data-id="${item.id}" draggable="true" class="${isSelected ? 'selected' : ''}">
-                    <td style="position:sticky; left:0; z-index:10; background:rgba(10,15,26,0.95);"><input type="checkbox" class="custom-checkbox row-checkbox" data-id="${item.id}" ${isSelected ? 'checked' : ''}></td>
-                    <td class="sticky-col-no" style="left:40px;">${index + 1}</td>
-                    <td class="sticky-col-nama" style="left:90px;" title="${escapeHtml(item.nama)}">${escapeHtml(item.nama)}</td>
-                    <td style="text-align:center"><span class="drag-handle"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></span></td>
-                    <td>${item.foto ? `<img src="${item.foto}" class="w-10 h-12 object-cover rounded" alt="">` : '<div class="w-10 h-12 bg-gray-800 rounded flex items-center justify-center text-xs text-gray-600">-</div>'}</td>
-                    <td>${escapeHtml(item.pangkatKorpsNrp)}</td>
-                    <td>${escapeHtml(item.tmtPangkat)}</td>
-                    <td>${calculateMDD(item.tmtPangkat)}</td>
-                    <td>${escapeHtml(item.tempatTglLahir)}</td>
-                    <td>${calculateAge(item.tempatTglLahir)}</td>
-                    <td>${escapeHtml(item.tmtTniAl)}</td>
-                    <td>${calculateMDD(item.tmtTniAl)}</td>
-                    <td>${escapeHtml(item.tmtKotama)}</td>
-                    <td>${escapeHtml(item.jabatan)}</td>
-                    <td>${escapeHtml(item.tmtJabatan)}</td>
-                    <td>${calculateMDD(item.tmtJabatan)}</td>
-                    <td>${escapeHtml(item.dikum)}</td>
-                    <td>${escapeHtml(item.dikmil)}</td>
-                    <td>${escapeHtml(item.dikbang)}</td>
-                    <td>${escapeHtml(item.bukuSaku)}</td>
-                    <td>${escapeHtml(item.nomorAsabri)}</td>
-                    <td>${escapeHtml(item.agama)}</td>
-                    <td>${escapeHtml(item.statusPerkawinan)}</td>
-                    <td>${escapeHtml(item.tunjangan)}</td>
-                    <td>${escapeHtml(item.statusTempatTinggal)}</td>
-                    <td>${escapeHtml(item.alamatTelp)}</td>
-                    <td><span class="status-badge ${statusClass}">${escapeHtml(item.statusPersonel)}</span></td>
-                    <td class="sticky-col-aksi">
-                        <div style="display:flex; gap:4px; flex-wrap:nowrap;">
-                            <button class="action-btn btn-sisip" onclick="sisipData(${item.id})">Sisip</button>
-                            <button class="action-btn btn-biodata" onclick="viewBiodata(${item.id})">Bio</button>
-                            <button class="action-btn btn-edit" onclick="editPersonel(${item.id})">Edit</button>
-                            <button class="action-btn btn-hapus" onclick="confirmDelete(${item.id})">Hapus</button>
-                        </div>
+            const tbody = document.getElementById('dataTableBody');
+            document.getElementById('emptyMessage').classList.toggle('hidden', data.length > 0);
+            tbody.innerHTML = data.map((item, i) => `
+                <tr>
+                    <td class="text-center">${i + 1}</td>
+                    <td>${item.nama || '-'}</td>
+                    <td>${item.pangkatKorpsNrp || '-'}</td>
+                    <td>${item.jabatan || '-'}</td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="editData(${item.id})">Edit</button>
+                        <button class="action-btn btn-hapus" onclick="hapusData(${item.id})">Hapus</button>
                     </td>
                 </tr>
-            `}).join('');
-            
-            initDragDrop();
+            `).join('');
         }
 
-        function filterData() {
-            const search = $('searchInput').value.toLowerCase().trim();
-            const pangkat = $('filterPangkat').value;
-            const status = $('filterStatus').value;
-            let filtered = allData;
-            if (search) filtered = filtered.filter(item => 
-                (item.nama || '').toLowerCase().includes(search) ||
-                (item.pangkatKorpsNrp || '').toLowerCase().includes(search) ||
-                (item.jabatan || '').toLowerCase().includes(search) ||
-                (item.alamatTelp || '').toLowerCase().includes(search)
-            );
-            if (pangkat) filtered = filtered.filter(item => extractPangkat(item.pangkatKorpsNrp).includes(pangkat));
-            if (status) filtered = filtered.filter(item => item.statusPersonel === status);
-            renderTable(filtered);
-        }
-
-        // ==================== Form ====================
-        function openFormModal(editMode = false, data = null, insertAfterId = null) {
-            $('formModal').classList.add('active');
-            $('insertAfterId').value = insertAfterId || '';
-            $('nrpError').classList.add('hidden');
-            
-            if (editMode && data) {
-                $('formTitle').textContent = 'Edit Data Personel';
-                $('editId').value = data.id;
-                $('nama').value = data.nama || '';
-                $('pangkatKorpsNrp').value = data.pangkatKorpsNrp || '';
-                $('tmtPangkat').value = data.tmtPangkat || '';
-                $('tempatTglLahir').value = data.tempatTglLahir || '';
-                $('tmtTniAl').value = data.tmtTniAl || '';
-                $('tmtKotama').value = data.tmtKotama || '';
-                $('jabatan').value = data.jabatan || '';
-                $('tmtJabatan').value = data.tmtJabatan || '';
-                $('dikum').value = data.dikum || '';
-                $('dikmil').value = data.dikmil || '';
-                $('dikbang').value = data.dikbang || '';
-                $('bukuSaku').value = data.bukuSaku || '';
-                $('nomorAsabri').value = data.nomorAsabri || '';
-                $('agama').value = data.agama || '';
-                $('statusPerkawinan').value = data.statusPerkawinan || '';
-                $('tunjangan').value = data.tunjangan || '';
-                $('statusTempatTinggal').value = data.statusTempatTinggal || '';
-                $('alamatTelp').value = data.alamatTelp || '';
-                $('statusPersonel').value = data.statusPersonel || 'Devinitiv';
-                currentPhoto = data.foto || '';
-                if (currentPhoto) {
-                    $('photoPreview').src = currentPhoto;
-                    $('photoPreview').classList.remove('hidden');
-                    $('photoPlaceholder').classList.add('hidden');
-                    $('removePhotoBtn').classList.remove('hidden');
-                }
-            } else {
-                $('formTitle').textContent = insertAfterId ? 'Sisip Data Personel' : 'Tambah Data Personel';
-                $('dataForm').reset();
-                $('editId').value = '';
-                currentPhoto = '';
-                $('photoPreview').classList.add('hidden');
-                $('photoPlaceholder').classList.remove('hidden');
-                $('removePhotoBtn').classList.add('hidden');
-            }
-            updateCalculatedFields();
-        }
-
-        const closeFormModal = () => $('formModal').classList.remove('active');
-        const updateCalculatedFields = () => {
-            $('mddp').textContent = calculateMDD($('tmtPangkat').value);
-            $('mddj').textContent = calculateMDD($('tmtJabatan').value);
-            $('usia').value = calculateAge($('tempatTglLahir').value);
-            $('masaDinas').value = calculateMDD($('tmtTniAl').value);
-        };
-
-        $('dataForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const editId = $('editId').value;
-            const nrpInput = $('pangkatKorpsNrp').value.trim();
-            
-            // NRP Validation - menggunakan fungsi yang diperbaiki
-            if (!validateNRP(nrpInput, editId ? parseInt(editId) : null)) {
-                $('nrpError').classList.remove('hidden');
-                $('pangkatKorpsNrp').focus();
-                return;
-            }
-            $('nrpError').classList.add('hidden');
-            
-            const data = {
-                nama: $('nama').value.trim(),
-                pangkatKorpsNrp: nrpInput,
-                tmtPangkat: $('tmtPangkat').value.trim(),
-                tempatTglLahir: $('tempatTglLahir').value.trim(),
-                tmtTniAl: $('tmtTniAl').value.trim(),
-                tmtKotama: $('tmtKotama').value.trim(),
-                jabatan: $('jabatan').value.trim(),
-                tmtJabatan: $('tmtJabatan').value.trim(),
-                dikum: $('dikum').value.trim(),
-                dikmil: $('dikmil').value.trim(),
-                dikbang: $('dikbang').value.trim(),
-                bukuSaku: $('bukuSaku').value.trim(),
-                nomorAsabri: $('nomorAsabri').value.trim(),
-                agama: $('agama').value,
-                statusPerkawinan: $('statusPerkawinan').value,
-                tunjangan: $('tunjangan').value,
-                statusTempatTinggal: $('statusTempatTinggal').value,
-                alamatTelp: $('alamatTelp').value.trim(),
-                statusPersonel: $('statusPersonel').value,
-                foto: currentPhoto
-            };
-            
-            const insertAfterId = $('insertAfterId').value;
-            
-            try {
-                if (editId) {
-                    data.id = parseInt(editId);
-                    const existing = allData.find(d => d.id === data.id);
-                    if (existing) { data.createdAt = existing.createdAt; data.orderIndex = existing.orderIndex; }
-                    await updatePersonel(data);
-                    await addHistory('EDIT', `Mengubah data: ${data.nama}`);
-                    showToast('Data berhasil diperbarui');
-                } else {
-                    await addPersonel(data, insertAfterId ? parseInt(insertAfterId) : null);
-                    await addHistory('TAMBAH', `Menambah data: ${data.nama}`);
-                    showToast(insertAfterId ? 'Data berhasil disisipkan' : 'Data berhasil disimpan');
-                }
-                closeFormModal();
-                await loadData();
-            } catch (error) {
-                console.error('Error saving data:', error);
-                showToast('Gagal menyimpan data', 'error');
-            }
-        });
-
-        // Photo handlers
-        $('photoContainer').addEventListener('click', () => $('photoInput').click());
-        $('uploadPhotoBtn').addEventListener('click', () => $('photoInput').click());
-        $('removePhotoBtn').addEventListener('click', () => {
+        document.getElementById('addDataBtn').addEventListener('click', () => {
+            document.getElementById('formTitle').textContent = 'Tambah Data Personel';
+            document.getElementById('dataForm').reset();
+            document.getElementById('editId').value = '';
             currentPhoto = '';
-            $('photoPreview').classList.add('hidden');
-            $('photoPlaceholder').classList.remove('hidden');
-            $('removePhotoBtn').classList.add('hidden');
-            $('photoInput').value = '';
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('photoPlaceholder').classList.remove('hidden');
+            document.getElementById('formModal').classList.add('active');
         });
-        $('photoInput').addEventListener('change', (e) => {
+
+        document.getElementById('closeFormModal').addEventListener('click', () => {
+            document.getElementById('formModal').classList.remove('active');
+        });
+
+        // Foto Handler
+        document.getElementById('photoContainer').addEventListener('click', () => document.getElementById('photoInput').click());
+        document.getElementById('photoInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     currentPhoto = ev.target.result;
-                    $('photoPreview').src = currentPhoto;
-                    $('photoPreview').classList.remove('hidden');
-                    $('photoPlaceholder').classList.add('hidden');
-                    $('removePhotoBtn').classList.remove('hidden');
+                    const prev = document.getElementById('photoPreview');
+                    prev.src = currentPhoto;
+                    prev.classList.remove('hidden');
+                    document.getElementById('photoPlaceholder').classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Auto-calc listeners
-        ['tmtPangkat', 'tmtJabatan', 'tempatTglLahir', 'tmtTniAl'].forEach(id => $(id).addEventListener('input', updateCalculatedFields));
-
-        // CRUD operations
-        const editPersonel = (id) => { const item = allData.find(d => d.id === id); if (item) openFormModal(true, item); };
-        const sisipData = (id) => openFormModal(false, null, id);
-        const confirmDelete = async (id) => {
-            if (confirm('Yakin hapus data ini?')) {
-                try {
-                    const item = allData.find(d => d.id === id);
-                    await deletePersonel(id);
-                    await addHistory('HAPUS', `Menghapus data: ${item?.nama || id}`);
-                    showToast('Data berhasil dihapus');
-                    await loadData();
-                } catch (error) { showToast('Gagal menghapus data', 'error'); }
-            }
-        };
-
-        // Batch delete
-        $('selectAll').addEventListener('change', (e) => {
-            const checked = e.target.checked;
-            document.querySelectorAll('.row-checkbox').forEach(cb => {
-                cb.checked = checked;
-                const id = parseInt(cb.dataset.id);
-                if (checked) selectedIds.add(id); else selectedIds.delete(id);
-            });
-            renderTable(allData);
-        });
-
-        $('dataTableBody').addEventListener('change', (e) => {
-            if (e.target.classList.contains('row-checkbox')) {
-                const id = parseInt(e.target.dataset.id);
-                if (e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
-                $('selectAll').checked = selectedIds.size === allData.length;
-                $('deleteSelectedBtn').classList.toggle('hidden', selectedIds.size === 0);
-                renderTable(allData);
-            }
-        });
-
-        $('deleteSelectedBtn').addEventListener('click', async () => {
-            if (selectedIds.size === 0) return;
-            if (!confirm(`Hapus ${selectedIds.size} data terpilih?`)) return;
-            showLoading();
-            try {
-                for (const id of selectedIds) await deletePersonel(id);
-                await addHistory('HAPUS MASSAL', `Menghapus ${selectedIds.size} data`);
-                selectedIds.clear();
-                $('selectAll').checked = false;
-                await loadData();
-                showToast('Data terpilih berhasil dihapus');
-            } catch (error) { showToast('Gagal menghapus data', 'error'); }
-            hideLoading();
-        });
-
-        // ==================== Import Excel ====================
-        $('importBtn').addEventListener('click', () => $('importInput').click());
-        $('importInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            showLoading();
-            const reader = new FileReader();
-            reader.onload = async (evt) => {
-                try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(sheet);
-                    
-                    let imported = 0, skipped = 0;
-                    for (const row of json) {
-                        const newNrpStr = String(row['Pangkat/Korps/NRP'] || row['NRP'] || '');
-                        if (!validateNRP(newNrpStr)) { skipped++; continue; }
-                        
-                        const personelData = {
-                            nama: row['Nama'] || '',
-                            pangkatKorpsNrp: newNrpStr,
-                            tmtPangkat: row['TMT Pangkat'] || '',
-                            tempatTglLahir: row['TTL'] || row['Tempat Tgl Lahir'] || '',
-                            tmtTniAl: row['TMT TNI AL'] || '',
-                            tmtKotama: row['TMT Kotama'] || '',
-                            jabatan: row['Jabatan'] || '',
-                            tmtJabatan: row['TMT Jabatan'] || '',
-                            dikum: row['Dikum'] || '',
-                            dikmil: row['Dikmil'] || '',
-                            dikbang: row['Dikbang'] || '',
-                            bukuSaku: row['Buku Saku'] || '',
-                            nomorAsabri: row['No Asabri'] || row['Nomor Asabri'] || '',
-                            agama: row['Agama'] || '',
-                            statusPerkawinan: row['Status Kawin'] || row['Status Perkawinan'] || '',
-                            tunjangan: String(row['Tunjangan'] || ''),
-                            statusTempatTinggal: row['Status Tinggal'] || row['Status Tempat Tinggal'] || '',
-                            alamatTelp: row['Alamat/Telp'] || row['Alamat'] || '',
-                            statusPersonel: row['Status'] || row['Status Personel'] || 'Devinitiv',
-                            foto: ''
-                        };
-                        
-                        if (personelData.nama) {
-                            await addPersonel(personelData);
-                            imported++;
-                        }
-                    }
-                    await addHistory('IMPORT', `Import dari Excel: ${imported} data berhasil, ${skipped} duplikat dilewati`);
-                    await loadData();
-                    showToast(`Import selesai: ${imported} berhasil, ${skipped} duplikat`);
-                } catch (error) {
-                    console.error('Import error:', error);
-                    showToast('Gagal import file', 'error');
-                }
-                hideLoading();
-                $('importInput').value = '';
+        document.getElementById('dataForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editId').value;
+            const data = {
+                nama: document.getElementById('nama').value,
+                pangkatKorpsNrp: document.getElementById('pangkatKorpsNrp').value,
+                jabatan: document.getElementById('jabatan').value,
+                foto: currentPhoto
             };
-            reader.readAsArrayBuffer(file);
-        });
-
-        $('exportExcelRingkasBtn')?.addEventListener('click', async () => {
-            await loadData();
-            if (!Array.isArray(allData) || allData.length === 0) {
-                alert("Tidak ada data");
-                return;
+            const tx = db.transaction(['personel'], 'readwrite');
+            const store = tx.objectStore('personel');
+            if (editId) {
+                data.id = parseInt(editId);
+                store.put(data);
+            } else {
+                store.add(data);
             }
-
-            const now = new Date();
-            const daftarBulan = [
-                "JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI",
-                "JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"
-            ];
-            const bulan = daftarBulan[now.getMonth()];
-            const tahun = now.getFullYear();
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([]);
-
-            let row = 0;
-
-            const kopData = [
-                ["KOMANDO ARMADA REPUBLIK INDONESIA"],
-                ["KOMANDO PENYELAM DAN PENYELAMATAN BAWAH AIR"],
-                [],
-                ["NOMINATIF KOPPEBA BULAN " + bulan + " " + tahun],
-                []
-            ];
-
-            XLSX.utils.sheet_add_aoa(ws, kopData, { origin: row });
-
-            for (let i = 0; i < 4; i++) {
-                const cell = ws[XLSX.utils.encode_cell({ r: row + i, c: 0 })];
-                if (!cell) continue;
-                cell.s = {
-                    font: { bold: true, sz: 14 },
-                    alignment: { horizontal: "center" }
-                };
-            }
-
-            const garisRow = row + 1;
-            const garisCell = ws[XLSX.utils.encode_cell({ r: garisRow, c: 0 })];
-            if (garisCell) {
-                garisCell.s = {
-                    border: {
-                        bottom: { style: "medium" }
-                    }
-                };
-            }
-
-            row += 5;
-
-            const headers = ["NO","NAMA","PANGKAT/KORPS/NRP","JABATAN","ALAMAT"];
-            XLSX.utils.sheet_add_aoa(ws, [headers], { origin: row });
-
-            for (let col = 0; col < 5; col++) {
-                const cell = ws[XLSX.utils.encode_cell({ r: row, c: col })];
-                cell.s = {
-                    font: { bold: true },
-                    alignment: { horizontal: "center", vertical: "center", wrapText: true },
-                    border: {
-                        top: { style: "thin" },
-                        bottom: { style: "thin" },
-                        left: { style: "thin" },
-                        right: { style: "thin" }
-                    }
-                };
-            }
-
-            row++;
-
-            allData.forEach((d, i) => {
-                const rowData = [
-                    i + 1,
-                    d.nama || "-",
-                    d.pangkatKorpsNrp || "-",
-                    d.jabatan || "-",
-                    d.alamatTelp || "-"
-                ];
-
-                XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: row });
-
-                for (let col = 0; col < 5; col++) {
-                    const cell = ws[XLSX.utils.encode_cell({ r: row, c: col })];
-                    cell.s = {
-                        alignment: {
-                            horizontal: col === 0 ? "center" : "left",
-                            vertical: "top",
-                            wrapText: true
-                        },
-                        border: {
-                            top: { style: "thin" },
-                            bottom: { style: "thin" },
-                            left: { style: "thin" },
-                            right: { style: "thin" }
-                        }
-                    };
-                }
-
-                row++;
-            });
-
-            row += 2;
-
-            const ttdData = [
-                ["", "", "", "a.n. Komandan Koppeba Koarmada RI"],
-                ["", "", "", "Dirpers"],
-                [],
-                ["", "", "", "Nur Legawa Handaka.W, S.P."],
-                ["", "", "", "Kolonel Laut (T) NRP 13328/P."]
-            ];
-
-            XLSX.utils.sheet_add_aoa(ws, ttdData, { origin: row });
-
-            for (let i = 0; i < 5; i++) {
-                const cell = ws[XLSX.utils.encode_cell({ r: row + i, c: 3 })];
-                if (!cell) continue;
-                cell.s = {
-                    alignment: { horizontal: "right" }
-                };
-            }
-
-            ws['!cols'] = [
-                { wch: 6 },
-                { wch: 25 },
-                { wch: 30 },
-                { wch: 25 },
-                { wch: 40 }
-            ];
-
-            ws['!pageSetup'] = { orientation: 'landscape' };
-
-            XLSX.utils.book_append_sheet(wb, ws, "DATA_RINGKAS");
-            XLSX.writeFile(wb, "DATA_PERSONEL_RINGKAS.xlsx");
-        });
-
-        // ==================== Backup & Restore ====================
-        $('backupBtn').addEventListener('click', async () => {
-            showLoading();
-            try {
-                const backup = {
-                    version: '1.0',
-                    timestamp: new Date().toISOString(),
-                    data: allData
-                };
-                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-                saveAs(blob, `backup_Koppeba_${new Date().toISOString().slice(0,10)}.json`);
-                await addHistory('BACKUP', 'Membuat backup data');
-                showToast('Backup berhasil dibuat');
-            } catch (error) { showToast('Gagal backup', 'error'); }
-            hideLoading();
-        });
-
-        $('restoreBtn').addEventListener('click', () => $('restoreInput').click());
-        $('restoreInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (!confirm('Restore akan menghapus data saat ini. Lanjutkan?')) return;
-            showLoading();
-            try {
-                const text = await file.text();
-                const backup = JSON.parse(text);
-                if (!backup.data) throw new Error('Invalid backup file');
-                
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                store.clear();
-                
-                for (const item of backup.data) {
-                    delete item.id;
-                    await addPersonel(item);
-                }
-                await addHistory('RESTORE', `Restore dari backup: ${backup.data.length} data`);
+            tx.oncomplete = async () => {
+                showToast('Data berhasil disimpan');
+                document.getElementById('formModal').classList.remove('active');
                 await loadData();
-                showToast(`Restore berhasil: ${backup.data.length} data`);
-            } catch (error) {
-                console.error('Restore error:', error);
-                showToast('Gagal restore file', 'error');
-            }
-            hideLoading();
-            $('restoreInput').value = '';
-        });
-
-        // ==================== History Modal ====================
-        $('historyBtn').addEventListener('click', async () => {
-            try {
-                const history = await getAllHistory();
-                history.reverse();
-                $('historyContent').innerHTML = history.length === 0 ? '<p class="text-gray-500 text-center">Belum ada riwayat</p>' : `
-                    <table class="w-full text-sm">
-                        <thead><tr class="border-b border-white/10"><th class="text-left py-2 text-[#d4a853]">Waktu</th><th class="text-left py-2 text-[#d4a853]">Aksi</th><th class="text-left py-2 text-[#d4a853]">Detail</th></tr></thead>
-                        <tbody>
-                            ${history.map(h => `
-                                <tr class="border-b border-white/5">
-                                    <td class="py-2 text-gray-400">${new Date(h.timestamp).toLocaleString('id-ID')}</td>
-                                    <td class="py-2">
-                                        <span class="px-2 py-1 rounded text-xs ${
-                                            h.action.includes('HAPUS') ? 'bg-red-500/20 text-red-400' :
-                                            h.action.includes('TAMBAH') ? 'bg-green-500/20 text-green-400' :
-                                            h.action.includes('EDIT') ? 'bg-yellow-500/20 text-yellow-400' :
-                                            'bg-blue-500/20 text-blue-400'
-                                        }">${h.action}</span>
-                                    </td>
-                                    <td class="py-2 text-gray-300">${escapeHtml(h.detail)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-                $('historyModal').classList.add('active');
-            } catch (error) { showToast('Gagal memuat riwayat', 'error'); }
-        });
-        $('closeHistoryModal').addEventListener('click', () => $('historyModal').classList.remove('active'));
-
-        // ==================== Statistik ====================
-        const statistikBtn = $('statistikBtn');
-
-        statistikBtn.addEventListener("click", function () {
-            const pangkat = {
-                tamtama: { KLD:0, KLS:0, KLK:0, KOPDA:0, KOPTU:0, KOPKA:0 },
-                bintara: { SERDA:0, SERTU:0, SERKA:0, SERMA:0, PELDA:0, PELTU:0 },
-                pama: { LETDA:0, LETTU:0, KAPTEN:0 },
-                pamen: { MAYOR:0, LETKOL:0, KOLONEL:0 },
-                pati: 0
             };
-
-            const agama = { ISLAM:0, KRISTEN:0, KATOLIK:0, HINDU:0, BUDHA:0 };
-
-            let total = allData.length;
-
-            allData.forEach(item => {
-                if(item.pangkatKorpsNrp){
-                    const p = item.pangkatKorpsNrp.split(" ")[0].toUpperCase();
-
-                    if(pangkat.tamtama[p] !== undefined) pangkat.tamtama[p]++;
-                    else if(pangkat.bintara[p] !== undefined) pangkat.bintara[p]++;
-                    else if(pangkat.pama[p] !== undefined) pangkat.pama[p]++;
-                    else if(pangkat.pamen[p] !== undefined) pangkat.pamen[p]++;
-                    else if(p.includes("LAKS")) pangkat.pati++;
-                }
-
-                if(item.agama){
-                    const a = item.agama.toUpperCase();
-                    if(agama[a] !== undefined) agama[a]++;
-                }
-            });
-
-            function totalObj(obj){
-                return Object.values(obj).reduce((a,b)=>a+b,0);
-            }
-
-            let html = `
-            <div style="background:white; color:black; padding:20px;">
-                <div style="display:flex; border:1px solid black;">
-                    <div style="flex:1; padding:20px; border-right:1px solid black;">
-                        <b>REKAP PANGKAT :</b><br><br>
-
-                        1. Tamtama : ${totalObj(pangkat.tamtama)}<br>
-                        ${Object.entries(pangkat.tamtama).map(([k,v])=>`• ${k} : ${v}<br>`).join("")}
-                        <br>
-
-                        2. Bintara : ${totalObj(pangkat.bintara)}<br>
-                        ${Object.entries(pangkat.bintara).map(([k,v])=>`• ${k} : ${v}<br>`).join("")}
-                        <br>
-
-                        3. Pama : ${totalObj(pangkat.pama)}<br>
-                        ${Object.entries(pangkat.pama).map(([k,v])=>`• ${k} : ${v}<br>`).join("")}
-                        <br>
-
-                        4. Pamen : ${totalObj(pangkat.pamen)}<br>
-                        ${Object.entries(pangkat.pamen).map(([k,v])=>`• ${k} : ${v}<br>`).join("")}
-                        <br>
-
-                        5. Pati : ${pangkat.pati}
-                    </div>
-
-                    <div style="flex:1; padding:20px;">
-                        <b>REKAP AGAMA :</b><br><br>
-                        1. ISLAM : ${agama.ISLAM}<br>
-                        2. KRISTEN : ${agama.KRISTEN}<br>
-                        3. KATOLIK : ${agama.KATOLIK}<br>
-                        4. HINDU : ${agama.HINDU}<br>
-                        5. BUDHA : ${agama.BUDHA}<br><br>
-
-                        <b>TOTAL PERSONEL : ${total} ORANG</b>
-                    </div>
-                </div>
-            </div>
-            `;
-
-            $('statistikContent').innerHTML = html;
-            $('statistikModal').classList.add('active');
-        });
-        
-        $('closeStatistikModal').addEventListener('click', function () {
-            $('statistikModal').classList.remove('active');
         });
 
-        // ==================== Biodata ====================
-        const viewBiodata = (id) => {
+        window.editData = (id) => {
             const item = allData.find(d => d.id === id);
             if (!item) return;
-            $('biodataContent').innerHTML = `
-                <div class="biodata-header">BIODATA PERSONEL KOPPEBA KOARMADA RI</div>
-                <div class="biodata-photo-box">${item.foto ? `<img src="${item.foto}" alt="Foto">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:10px;color:#666;text-align:center;">TIDAK ADA FOTO<br>(4x6 cm)</div>'}</div>
-                <table class="biodata-table" style="width: calc(100% - 5cm);">
-                    <tr><td class="label">1. Nama</td><td>: ${escapeHtml(item.nama)}</td></tr>
-                    <tr><td class="label">2. Pangkat / Korps / NRP</td><td>: ${escapeHtml(item.pangkatKorpsNrp)}</td></tr>
-                    <tr><td class="label">3. TMT Pangkat</td><td>: ${escapeHtml(item.tmtPangkat)}</td></tr>
-                    <tr><td class="label">&nbsp;&nbsp;&nbsp;Masa Dinas Dlm Pangkat</td><td>: ${calculateMDD(item.tmtPangkat)}</td></tr>
-                    <tr><td class="label">4. Tempat, Tanggal Lahir</td><td>: ${escapeHtml(item.tempatTglLahir)}</td></tr>
-                    <tr><td class="label">&nbsp;&nbsp;&nbsp;Usia</td><td>: ${calculateAge(item.tempatTglLahir)}</td></tr>
-                    <tr><td class="label">6. TMT TNI AL</td><td>: ${escapeHtml(item.tmtTniAl)}</td></tr>
-                    <tr><td class="label">&nbsp;&nbsp;&nbsp;Masa Dinas</td><td>: ${calculateMDD(item.tmtTniAl)}</td></tr>
-                    <tr><td class="label">8. TMT Kotama</td><td>: ${escapeHtml(item.tmtKotama)}</td></tr>
-                    <tr><td class="label">9. Jabatan</td><td>: ${escapeHtml(item.jabatan)}</td></tr>
-                    <tr><td class="label">&nbsp;&nbsp;&nbsp;TMT Jabatan</td><td>: ${escapeHtml(item.tmtJabatan)}</td></tr>
-                    <tr><td class="label">&nbsp;&nbsp;&nbsp;Masa Dinas Dlm Jabatan</td><td>: ${calculateMDD(item.tmtJabatan)}</td></tr>
-                    <tr><td class="label">10. Dikum</td><td>: ${escapeHtml(item.dikum)}</td></tr>
-                    <tr><td class="label">11. Dikmil</td><td>: ${escapeHtml(item.dikmil)}</td></tr>
-                    <tr><td class="label">12. Dikbang</td><td>: ${escapeHtml(item.dikbang)}</td></tr>
-                    <tr><td class="label">13. Buku Saku</td><td>: ${escapeHtml(item.bukuSaku)}</td></tr>
-                    <tr><td class="label">14. Nomor Asabri</td><td>: ${escapeHtml(item.nomorAsabri)}</td></tr>
-                    <tr><td class="label">15. Agama</td><td>: ${escapeHtml(item.agama)}</td></tr>
-                    <tr><td class="label">16. Status Perkawinan</td><td>: ${escapeHtml(item.statusPerkawinan)}</td></tr>
-                    <tr><td class="label">17. Tunjangan</td><td>: ${escapeHtml(item.tunjangan)}</td></tr>
-                    <tr><td class="label">18. Status Tempat Tinggal</td><td>: ${escapeHtml(item.statusTempatTinggal)}</td></tr>
-                    <tr><td class="label">19. Alamat / Telp</td><td>: ${escapeHtml(item.alamatTelp)}</td></tr>
-                </table>
-            `;
-            $('biodataModal').classList.add('active');
+            document.getElementById('formTitle').textContent = 'Edit Data Personel';
+            document.getElementById('editId').value = item.id;
+            document.getElementById('nama').value = item.nama || '';
+            document.getElementById('pangkatKorpsNrp').value = item.pangkatKorpsNrp || '';
+            document.getElementById('jabatan').value = item.jabatan || '';
+            currentPhoto = item.foto || '';
+            if (currentPhoto) {
+                const prev = document.getElementById('photoPreview');
+                prev.src = currentPhoto;
+                prev.classList.remove('hidden');
+                document.getElementById('photoPlaceholder').classList.add('hidden');
+            }
+            document.getElementById('formModal').classList.add('active');
         };
-        $('closeBiodataModal').addEventListener('click', () => $('biodataModal').classList.remove('active'));
-        $('printBiodataBtn').addEventListener('click', () => {
-            const pw = window.open('', '_blank');
-            pw.document.write(`<html><head><title>Biodata</title><style>body{font-family:Arial;padding:20px;margin:0}.biodata-header{text-align:center;font-weight:bold;font-size:16px;background:#1a202c;color:#d4a853;padding:10px;margin-bottom:20px}.biodata-photo-box{width:4cm;height:6cm;border:1px solid #000;position:absolute;top:70px;right:20px;background:#f0f0f0}.biodata-photo-box img{width:100%;height:100%;object-fit:cover}table{width:calc(100% - 5cm);border-collapse:collapse}td{padding:5px 8px;border:1px solid #000;font-size:12px}.label{width:40%;background:#e2e8f0;font-weight:500}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>${$('biodataContent').innerHTML}<script>window.onload=()=>window.print()<\/script></body></html>`);
-            pw.document.close();
-        });
 
-        // ==================== Export Functions ====================
-        function getHeaders() {
-            return [
-                'No','Nama','Pangkat/Korps/NRP',
-                'TMT Pangkat (MDDP)',
-                'TTL (Usia)',
-                'TMT TNI AL (Masa Dinas)',
-                'TMT Kotama',
-                'Jabatan, TMT (MDDJ)',
-                'Dikum','Dikmil','Dikbang',
-                'Buku Saku','No Asabri','Agama',
-                'Status Kawin','Tunjangan',
-                'Status Tinggal','Alamat/Telp',
-            ];
-        }
-
-        function getRows() {
-            return allData.map((d, i) => [
-                i+1,
-                d.nama || "-",
-                d.pangkatKorpsNrp || "-",
-                `${d.tmtPangkat || "-"} (${calculateMDD(d.tmtPangkat) || "-"})`,
-                `${d.tempatTglLahir || "-"} (${calculateAge(d.tempatTglLahir) || "-"})`,
-                `${d.tmtTniAl || "-"} (${calculateMDD(d.tmtTniAl) || "-"})`,
-                d.tmtKotama || "-",
-                `${d.jabatan || "-"}, ${d.tmtJabatan || "-"} (${calculateMDD(d.tmtJabatan) || "-"})`,
-                d.dikum || "-",
-                d.dikmil || "-",
-                d.dikbang || "-",
-                d.bukuSaku || "-",
-                d.nomorAsabri || "-",
-                d.agama || "-",
-                d.statusPerkawinan || "-",
-                d.tunjangan || "-",
-                d.statusTempatTinggal || "-",
-                d.alamatTelp || "-",
-            ]);
-        }
-
-        // ======================= PRINT =======================
-        $('printReportBtn')?.addEventListener('click', async () => {
-            await loadData();
-            if (!Array.isArray(allData) || allData.length === 0) {
-                alert("Tidak ada data");
-                return;
+        window.hapusData = async (id) => {
+            if (confirm('Yakin ingin menghapus data ini?')) {
+                const tx = db.transaction(['personel'], 'readwrite');
+                tx.objectStore('personel').delete(id);
+                tx.oncomplete = async () => {
+                    showToast('Data berhasil dihapus');
+                    await loadData();
+                };
             }
+        };
 
-            const headers = [
-                'No','Nama','Pangkat/Korps/NRP',
-                'TMT Pangkat (MDDP)',
-                'TTL (Usia)',
-                'TMT TNI AL (Masa Dinas)',
-                'TMT Kotama',
-                'Jabatan, TMT (MDDJ)',
-                'Dikum','Dikmil','Dikbang',
-                'Buku Saku','No Asabri','Agama',
-                'Status Kawin','Tunjangan',
-                'Status Tinggal','Alamat/Telp',
-            ];
-
-            const rows = allData.map((d, i) => [
-                i+1,
-                d.nama || "-",
-                d.pangkatKorpsNrp || "-",
-                `${d.tmtPangkat || "-"} (${calculateMDD(d.tmtPangkat) || "-"})`,
-                `${d.tempatTglLahir || "-"} (${calculateAge(d.tempatTglLahir) || "-"})`,
-                `${d.tmtTniAl || "-"} (${calculateMDD(d.tmtTniAl) || "-"})`,
-                d.tmtKotama || "-",
-                `${d.jabatan || "-"}, ${d.tmtJabatan || "-"} (${calculateMDD(d.tmtJabatan) || "-"})`,
-                d.dikum || "-",
-                d.dikmil || "-",
-                d.dikbang || "-",
-                d.bukuSaku || "-",
-                d.nomorAsabri || "-",
-                d.agama || "-",
-                d.statusPerkawinan || "-",
-                d.tunjangan || "-",
-                d.statusTempatTinggal || "-",
-                d.alamatTelp || "-",
-                d.statusPersonel || "-"
-            ]);
-
-            let html = "<h2 style='text-align:center'>DAFTAR PERSONEL KOPPEBA KOARMADA RI</h2>";
-            html += "<table border='1' cellspacing='0' cellpadding='4' style='width:100%;font-size:10px;border-collapse:collapse'>";
-            html += "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr>";
-
-            rows.forEach(r => {
-                html += "<tr>" + r.map(c => `<td>${c}</td>`).join("") + "</tr>";
-            });
-
-            html += "</table>";
-
-            const w = window.open("");
-            w.document.write(html);
-            w.print();
-            w.close();
+        // Tombol Export Excel / PDF / Word / Cetak
+        document.getElementById('exportExcelBtn').addEventListener('click', () => {
+            if (!allData.length) return alert('Tidak ada data');
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(allData);
+            XLSX.utils.book_append_sheet(wb, ws, "Personel");
+            XLSX.writeFile(wb, "Data_Personel.xlsx");
         });
 
-        // ======================= PDF =======================
-        $('exportPdfBtn')?.addEventListener("click", async () => {
-            await loadData();
-            if (!allData.length) return alert("Tidak ada data");
-
+        document.getElementById('exportPdfBtn').addEventListener('click', () => {
+            if (!allData.length) return alert('Tidak ada data');
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF("l", "mm", "a4");
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(9);
-
-            doc.text("KOMANDO ARMADA REPUBLIK INDONESIA", 22, 10);
-            doc.text("KOMANDO PENYELAM DAN PENYELAMATAN BAWAH AIR", 10, 13);
-            doc.setLineWidth(0.3);
-            doc.line(10, 15, 100, 15);
-
-            const now = new Date();
-            const daftarBulan = [
-                "JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI",
-                "JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"
-            ];
-
-            const bulan = daftarBulan[now.getMonth()];
-            const tahun = now.getFullYear();
-            doc.setFontSize(10);
-            doc.text(`NOMINATIF KOPPEBA BULAN ${bulan} ${tahun}`, 148, 24, { align: "center" });
-
+            const doc = new jsPDF();
+            doc.text("DATA PERSONEL KOPPEBA", 14, 15);
             doc.autoTable({
-                startY: 35,
-                head: [
-                    [
-                        "No","Nama","Pangkat/Korps/NRP",
-                        "TMT Pangkat (MDDP)",
-                        "TTL (Usia)",
-                        "TMT TNI AL (MD)",
-                        "TMT Kotama",
-                        "Jabatan (MJAB)",
-                        "Dikum","Dikmil","Dikbang",
-                        "Buku Saku","No Asabri","Agama",
-                        "Status Kawin","Tunj",
-                        "Status Tinggal","Alamat/Telp"
-                    ],
-                    [
-                        "1","2","3","4","5","6","7","8",
-                        "9","10","11","12","13","14",
-                        "15","16","17","18"
-                    ]
-                ],
-                body: getRows(),
-                theme: "grid",
-                styles: {
-                    fontSize: 6,
-                    cellPadding: 1,
-                    halign: "left",
-                    lineWidth: 0.3,
-                    lineColor: 0
-                },
-                columnStyles: {
-                    0: { halign: "center" }
-                },
-                headStyles: {
-                    fontStyle: "bold",
-                    halign: "center",
-                    fillColor: false,
-                    textColor: 0,
-                    lineWidth: 0.5
-                },
-                showHead: "everyPage",
-                didParseCell: function (data) {
-                    if (data.section === 'head' &&
-                        data.row.index === 0 &&
-                        data.pageNumber > 1) {
-                        data.cell.text = "";
-                    }
-                }
-            }); 
-
-            const totalPages = doc.internal.getNumberOfPages();
-            doc.setPage(totalPages);
-
-            let finalY = doc.lastAutoTable.finalY || 20;
-            finalY += 10;
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-
-            doc.text("a.n. Komandan Koppeba Koarmada RI", 200, finalY);
-            doc.text("Dirpers,", 223, finalY + 4);
-            doc.text("", 200, finalY + 18);
-            doc.text("Nur Legawa Handaka, S.P.", 248, finalY + 24, { align: "right" });
-            doc.text("Kolonel Laut (T) NRP 12424/P.", 251, finalY + 28, { align: "right" });
-
-            doc.save("DATA_PERSONEL_KOPPEBA.pdf");
+                startY: 25,
+                head: [['No', 'Nama', 'Pangkat/NRP', 'Jabatan']],
+                body: allData.map((d, i) => [i+1, d.nama, d.pangkatKorpsNrp, d.jabatan])
+            });
+            doc.save("Data_Personel.pdf");
         });
 
-        // ======================= WORD =======================
-        $('exportWordBtn')?.addEventListener('click', async () => {
-            await loadData();
-            if (!Array.isArray(allData) || allData.length === 0) {
-                alert("Tidak ada data");
-                return;
-            }
-
-            const headers = [
-                'No','Nama','Pangkat/Korps/NRP',
-                'TMT Pangkat (MDDP)',
-                'TTL (Usia)',
-                'TMT TNI AL (MDINAS)',
-                'TMT Kotama',
-                'Jabatan (MJAB)',
-                'Dikum','Dikmil','Dikbang',
-                'Buku Saku','No Asabri','Agama',
-                'Status Kawin','Tunj',
-                'Status Tinggal','Alamat/Telp'
+        document.getElementById('exportWordBtn').addEventListener('click', async () => {
+            if (!allData.length) return alert('Tidak ada data');
+            const rows = [
+                new docx.TableRow({
+                    children: ['No', 'Nama', 'Pangkat/NRP', 'Jabatan'].map(h => new docx.TableCell({ children: [new docx.Paragraph(h)] }))
+                })
             ];
-
-            const rows = [];
-
-            rows.push(new docx.TableRow({
-                tableHeader: true,
-                children: headers.map(h =>
-                    new docx.TableCell({
-                        verticalAlign: docx.VerticalAlign.CENTER,
-                        children: [
-                            new docx.Paragraph({
-                                alignment: docx.AlignmentType.CENTER,
-                                children: [
-                                    new docx.TextRun({
-                                        text: h,
-                                        bold: true,
-                                        size: 16
-                                    })
-                                ]
-                            })
-                        ]
-                    })
-                )
-            }));
-
             allData.forEach((d, i) => {
-                const rowData = [
-                    i+1,
-                    d.nama || "-",
-                    d.pangkatKorpsNrp || "-",
-                    (d.tmtPangkat || "-") + " (" + (calculateMDD(d.tmtPangkat) || "-") + ")",
-                    (d.tempatTglLahir || "-") + " (" + (calculateAge(d.tempatTglLahir) || "-") + ")",
-                    (d.tmtTniAl || "-") + " (" + (calculateMDD(d.tmtTniAl) || "-") + ")",
-                    d.tmtKotama || "-",
-                    (d.jabatan || "-") + " (" + (calculateMDD(d.tmtJabatan) || "-") + ")",
-                    d.dikum || "-",            
-                    d.dikmil || "-",
-                    d.dikbang || "-",
-                    d.bukuSaku || "-",
-                    d.nomorAsabri || "-",
-                    d.agama || "-",
-                    d.statusPerkawinan || "-",
-                    d.tunjangan || "-",
-                    d.statusTempatTinggal || "-",
-                    d.alamatTelp || "-"
-                ];
-
                 rows.push(new docx.TableRow({
-                    children: rowData.map(c =>
-                        new docx.TableCell({
-                            verticalAlign: docx.VerticalAlign.TOP,
-                            children: [
-                                new docx.Paragraph({
-                                    alignment: !isNaN(parseFloat(c)) ? docx.AlignmentType.CENTER : docx.AlignmentType.LEFT,
-                                    children: [
-                                        new docx.TextRun({ text: String(c), size: 16 })
-                                    ]
-                                })
-                            ]
-                        })
-                    )
+                    children: [String(i+1), d.nama || '', d.pangkatKorpsNrp || '', d.jabatan || ''].map(c => new docx.TableCell({ children: [new docx.Paragraph(c)] }))
                 }));
             });
-
-            const table = new docx.Table({
-                rows: rows,
-                width: {
-                    size: 100,
-                    type: docx.WidthType.PERCENTAGE
-                },
-                layout: docx.TableLayoutType.FIXED,
-                borders: {
-                    top: { style: docx.BorderStyle.SINGLE, size: 2 },
-                    bottom: { style: docx.BorderStyle.SINGLE, size: 2 },
-                    left: { style: docx.BorderStyle.SINGLE, size: 2 },
-                    right: { style: docx.BorderStyle.SINGLE, size: 2 },
-                    insideHorizontal: { style: docx.BorderStyle.SINGLE, size: 1 },
-                    insideVertical: { style: docx.BorderStyle.SINGLE, size: 1 }
-                }
-            });
-
-            const doc = new docx.Document({
-                sections: [{
-                    properties: {
-                        page: {
-                            margin: {
-                                top: 500,
-                                right: 500,
-                                bottom: 500,
-                                left: 500
-                            },
-                            size: {
-                                orientation: docx.PageOrientation.LANDSCAPE
-                            }
-                        }
-                    },
-                    children: [
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.LEFT,
-                            spacing: { after: 58 },
-                            children: [
-                                new docx.TextRun({
-                                    text: "KOMANDO ARMADA REPUBLIK INDONESIA",
-                                    bold: true,
-                                    size: 18
-                                })
-                            ]
-                        }),
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.LEFT,
-                            spacing: { after: 50 },
-                            children: [
-                                new docx.TextRun({
-                                    text: "KOMANDO PENYELAM DAN PENYELAMATAN BAWAH AIR",
-                                    bold: true,
-                                    size: 18
-                                })
-                            ]
-                        }),
-                        new docx.Paragraph({
-                            border: {
-                                bottom: {
-                                    style: docx.BorderStyle.SINGLE,
-                                    size: 4
-                                }
-                            },
-                            spacing: { after: 200 }
-                        }),
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.CENTER,
-                            spacing: { after: 200 },
-                            children: [
-                                new docx.TextRun({
-                                    text: "NOMINATIF KOPPEBA KOARMADA RI",
-                                    bold: true,
-                                    size: 24
-                                })
-                            ]
-                        }),
-                        table,
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.RIGHT,
-                            spacing: { before: 300 },
-                            children: [
-                                new docx.TextRun({
-                                    text: "a.n. Komandan Koppeba Koarmada RI",
-                                    size: 18
-                                })
-                            ]
-                        }),
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.RIGHT,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Dirpers,",
-                                    size: 18
-                                })
-                            ]
-                        }),
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.RIGHT,
-                            spacing: { before: 600 },
-                            children: [
-                                new docx.TextRun({
-                                    text: "Nur Legawa Handaka.W, S.P.",
-                                    bold: true,
-                                    size: 18
-                                })
-                            ]
-                        }),
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.RIGHT,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Kolonel Laut (T) NRP 12424/P.",
-                                    size: 18
-                                })
-                            ]
-                        })
-                    ]
-                }]
-            });
-
+            const doc = new docx.Document({ sections: [{ children: [new docx.Table({ rows })] }] });
             const blob = await docx.Packer.toBlob(doc);
-            saveAs(blob, "DATA_PERSONEL_KOPPEBA.docx");
+            saveAs(blob, "Data_Personel.docx");
         });
 
-        // ======================= EXCEL =======================
-        $('exportExcelBtn')?.addEventListener('click', async () => {
-            await loadData();
-            if (!Array.isArray(allData) || allData.length === 0) {
-                alert("Tidak ada data");
-                return;
-            }
-
-            const headers = [
-                'No','Nama','Pangkat/Korps/NRP',
-                'TMT Pangkat (MDDP)',
-                'TTL (Usia)',
-                'TMT TNI AL (Masa Dinas)',
-                'TMT Kotama',
-                'Jabatan, TMT (MDDJ)',
-                'Dikum','Dikmil','Dikbang',
-                'Buku Saku','No Asabri','Agama',
-                'Status Kawin','Tunjangan',
-                'Status Tinggal','Alamat/Telp',
-            ];
-
-            const rows = allData.map((d, i) => [
-                i+1,
-                d.nama || "-",
-                d.pangkatKorpsNrp || "-",
-                `${d.tmtPangkat || "-"} (${calculateMDD(d.tmtPangkat) || "-"})`,
-                `${d.tempatTglLahir || "-"} (${calculateAge(d.tempatTglLahir) || "-"})`,
-                `${d.tmtTniAl || "-"} (${calculateMDD(d.tmtTniAl) || "-"})`,
-                d.tmtKotama || "-",
-                `${d.jabatan || "-"}, ${d.tmtJabatan || "-"} (${calculateMDD(d.tmtJabatan) || "-"})`,
-                d.dikum || "-",
-                d.dikmil || "-",
-                d.dikbang || "-",
-                d.bukuSaku || "-",
-                d.nomorAsabri || "-",
-                d.agama || "-",
-                d.statusPerkawinan || "-",
-                d.tunjangan || "-",
-                d.statusTempatTinggal || "-",
-                d.alamatTelp || "-",
-            ]);
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-
-            const range = XLSX.utils.decode_range(ws['!ref']);
-
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cell = XLSX.utils.encode_cell({ r: R, c: C });
-                    if (!ws[cell]) continue;
-
-                    ws[cell].s = {
-                        font: { sz: 9, bold: R === 0 },
-                        border: {
-                            top: { style: "thin" },
-                            bottom: { style: "thin" },
-                            left: { style: "thin" },
-                            right: { style: "thin" }
-                        },
-                        alignment: {
-                            vertical: "center",
-                            horizontal: R === 0 ? "center" : "left",
-                            wrapText: true
-                        }
-                    };
-                }
-            }
-
-            ws['!cols'] = [
-                { wch:4 },
-                { wch:20 },
-                { wch:14 },
-                { wch:12 },
-                { wch:14 },
-                { wch:9 },
-                { wch:9 },
-                { wch:14 },
-                { wch:4 },
-                { wch:14 },
-                { wch:14 },
-                { wch:6 },
-                { wch:9 },
-                { wch:10 },
-                { wch:6 },
-                { wch:6 },
-                { wch:6 },
-                { wch:25 },
-            ];
-
-            ws['!pageSetup'] = {
-                orientation: "landscape",
-                fitToWidth: 1,
-                fitToHeight: 0
-            };
-
-            XLSX.utils.book_append_sheet(wb, ws, "DATA PERSONEL");
-            XLSX.writeFile(wb, "DATA_PERSONEL_KOPPEBA.xlsx");
+        document.getElementById('printReportBtn').addEventListener('click', () => {
+            window.print();
         });
 
-        // ==================== Drag & Drop ====================
-        let draggedRowGlobal = null;
-
-        function initDragDrop() {
-            const rows = document.querySelectorAll("#dataTableBody tr");
-
-            rows.forEach(row => {
-                row.addEventListener("dragstart", handleDragStart);
-                row.addEventListener("dragend", handleDragEnd);
-                row.addEventListener("dragover", handleDragOver);
-                row.addEventListener("dragleave", handleDragLeave);
-                row.addEventListener("drop", handleDrop);
-            });
-        }
-
-        function handleDragStart(e) {
-            draggedRowGlobal = this;
-            this.classList.add("dragging");
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", this.dataset.id);
-        }
-
-        function handleDragEnd() {
-            this.classList.remove("dragging");
-            document.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move";
-            if (this !== draggedRowGlobal) {
-                this.classList.add("drag-over");
-            }
-        }
-
-        function handleDragLeave() {
-            this.classList.remove("drag-over");
-        }
-
-        async function handleDrop(e) {
-            e.preventDefault();
-            this.classList.remove("drag-over");
-
-            if (this === draggedRowGlobal) return;
-
-            const fromId = parseInt(draggedRowGlobal.dataset.id);
-            const toId = parseInt(this.dataset.id);
-
-            const fromItem = allData.find(d => d.id === fromId);
-            const toItem = allData.find(d => d.id === toId);
-
-            if (!fromItem || !toItem) return;
-
-            const tempOrder = fromItem.orderIndex;
-            fromItem.orderIndex = toItem.orderIndex;
-            toItem.orderIndex = tempOrder;
-
-            await updatePersonel(fromItem);
-            await updatePersonel(toItem);
-            await loadData();
-
-            showToast("Urutan berhasil diubah");
-        }
-
-        // ==================== Init ====================
-        async function init() {
-            try {
-                await initDB();
-                const rememberedUser = await getRememberedUser();
-                if (rememberedUser) { $('username').value = rememberedUser.username; $('rememberMe').checked = true; }
-                $('addDataBtn').addEventListener('click', () => openFormModal(false));
-                $('closeFormModal').addEventListener('click', closeFormModal);
-                $('resetFormBtn').addEventListener('click', () => $('dataForm').reset());
-                $('searchInput').addEventListener('input', filterData);
-                $('filterPangkat').addEventListener('change', filterData);
-                $('filterStatus').addEventListener('change', filterData);
-                if ('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-            } catch (error) {
-                console.error('Init error:', error);
-                showToast('Gagal inisialisasi', 'error');
-            }
-        }
-
-        init();
-        window.editPersonel = editPersonel;
-        window.confirmDelete = confirmDelete;
-        window.viewBiodata = viewBiodata;
-        window.sisipData = sisipData;
+        initDB();
     </script>
-     <!-- ===== AREA KHUSUS PRINT ===== -->
-    <div id="printArea" style="display:none">
-        <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
-            KOMANDO ARMADA REPUBLIK INDONESIA<br>
-            KOMANDO PENYELAM DAN PENYELAMATAN BAWAH AIR<br><br>
-            NOMINATIF KOPPEBA BULAN JANUARI 2024
-        </div>
-        <table id="printTable" style="width:100%; border-collapse:collapse; font-size:11px;">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>Pangkat/Korps/NRP</th>
-                    <th>TMT Pangkat</th>
-                    <th>TTL</th>
-                    <th>TMT TNI AL</th>
-                    <th>Jabatan</th>
-                    <th>Dikum</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="printBody"></tbody>
-        </table>
-    </div>
 </body>
 </html>
